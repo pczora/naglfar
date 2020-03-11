@@ -1,0 +1,67 @@
+---
+- name: Setup Vundle
+  hosts: localhost
+  tasks:
+  - name: Clone Vundle repo
+    git:
+      repo: https://github.com/VundleVim/Vundle.vim.git
+      dest: ~/.vim/bundle/Vundle.vim
+
+- name: Setup oh-my-zsh
+  hosts: localhost
+  tasks:
+  - name: Check if oh-my-zsh is already installed
+    stat:
+      path: ~/.oh-my-zsh
+    register: ohmyzshdir
+
+  - name: Download oh-my-zsh-installer
+    get_url: 
+      url: https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
+      dest: /tmp/oh-my-zsh.sh
+    when: ohmyzshdir.stat.exists == False
+  - name: Set installer file modes
+    file:
+      path: /tmp/oh-my-zsh.sh
+      mode: a+x
+    when: ohmyzshdir.stat.exists == False
+  - name: Install oh-my-zsh
+    shell: /tmp/oh-my-zsh.sh
+    when: ohmyzshdir.stat.exists == False
+  - name: Remove installer
+    file: 
+      path: /tmp/oh-my-zsh.sh
+      state: absent
+    when: ohmyzshdir.stat.exists == False
+
+- name: Setup spaceship-prompt
+  hosts: localhost
+  tasks:
+  - name: Clone spaceship repo
+    git:
+      repo: https://github.com/denysdovhan/spaceship-prompt.git
+      dest: ~/.oh-my-zsh/custom/themes/spaceship-prompt
+  - name: Symlink theme
+    file:
+      src: ~/.oh-my-zsh/custom/themes/spaceship-prompt/spaceship.zsh-theme
+      dest: ~/.oh-my-zsh/custom/themes/spaceship.zsh-theme
+      state: link
+
+- name: Setup base16-shell
+  hosts: localhost
+  tasks:
+  - name: Clone base16-shell repo
+    git:
+      repo: https://github.com/chriskempson/base16-shell.git
+      dest: ~/.config/base16-shell
+    
+- name: Setup gnome
+  hosts: localhost
+  tasks:
+  - name: Check if gsettings exists
+    stat:
+      path: /usr/bin/gsettings
+    register: gsettings
+  - name: Unset Alt+Space
+    command: gsettings set org.gnome.desktop.wm.keybindings activate-window-menu '[]'
+    when: gsettings.stat.exists == True
