@@ -19,6 +19,16 @@
       name: docker
       state: started
       enabled: yes
+
+- name: Setup VIM
+  hosts: localhost
+  tasks:
+  - name: Install VIM
+    become: yes
+    package:
+      name: vim
+      state: latest
+
 - name: Setup Vundle
   hosts: localhost
   tasks:
