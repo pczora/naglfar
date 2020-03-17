@@ -25,6 +25,32 @@
       path: /tmp/sdkman.sh
       state: absent
     when: sdkmandir.stat.exists == False
+- name: Setup nvm
+  hosts: localhost
+  tasks:
+  - name: Check if nvm is already installed
+    stat:
+      path: ~/.nvm
+    register: nvmdir
+
+  - name: Download oh-my-zsh-installer
+    get_url: 
+      url: https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh
+      dest: /tmp/nvm.sh
+    when: nvmdir.stat.exists == False
+  - name: Set installer file modes
+    file:
+      path: /tmp/nvm.sh
+      mode: a+x
+    when: nvmdir.stat.exists == False
+  - name: Install nvm
+    shell: /tmp/nvm.sh
+    when: nvmdir.stat.exists == False
+  - name: Remove installer
+    file: 
+      path: /tmp/nvm.sh
+      state: absent
+    when: nvmdir.stat.exists == False
 - name: Setup Docker
   hosts: localhost
   tasks:
