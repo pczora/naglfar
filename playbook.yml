@@ -25,6 +25,7 @@
       path: /tmp/sdkman.sh
       state: absent
     when: sdkmandir.stat.exists == False
+
 - name: Setup nvm
   hosts: localhost
   tasks:
@@ -51,32 +52,17 @@
       path: /tmp/nvm.sh
       state: absent
     when: nvmdir.stat.exists == False
-- name: Setup Docker
+
+- name: Install Docker
   hosts: localhost
-  tasks:
-  - name: Install Docker
-    become: yes
-    package:
-      name: docker
-      state: latest
-  - name: Add docker group to current user
-    become: yes
-    user:
-      name: "{{ ansible_user_id }}"
-      groups: docker
-      append: yes
-  - name: Enable and start Docker daemon
-    become: yes
-    systemd:
-      name: docker
-      state: started
-      enabled: yes
+  tasks: 
+      - import_tasks: tasks/docker/docker.yml
 
 - name: Setup VIM
   hosts: localhost
   tasks:
   - name: Install VIM
-    become: yes
+    become: "{{ 'no' if ansible_distribution == 'MacOSX' else 'yes' }}"
     package:
       name: vim
       state: latest

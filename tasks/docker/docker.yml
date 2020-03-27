@@ -1,0 +1,7 @@
+- name: Install Docker on Linux
+  import_tasks: docker_linux.yml
+  when: (ansible_distribution == "Debian") or (ansible_distribution == "Archlinux")
+
+- name: Install Docker on MacOS
+  import_tasks: docker_mac.yml
+  when: (ansible_distribution == "MacOSX")
