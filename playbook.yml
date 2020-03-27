@@ -56,7 +56,7 @@
 - name: Install Docker
   hosts: localhost
   tasks: 
-      - import_tasks: tasks/docker/docker.yml
+  - import_tasks: tasks/docker/docker.yml
 
 - name: Setup VIM
   hosts: localhost
@@ -133,3 +133,25 @@
   - name: Unset Alt+Space
     command: gsettings set org.gnome.desktop.wm.keybindings activate-window-menu '[]'
     when: gsettings.stat.exists == True
+
+- name: Setup tmux
+  hosts: localhost
+  tasks:
+  - name: Install tmux
+    become: "{{ 'no' if ansible_distribution == 'MacOSX' else 'yes' }}"
+    package:
+      name: tmux
+      state: latest
+  - name: Install tpm
+    git:
+      repo: https://github.com/tmux-plugins/tpm
+      dest: ~/.tmux/plugins/tpm
+      
+- name: Setup stow
+  hosts: localhost
+  tasks:
+  - name: Install stow
+    become: "{{ 'no' if ansible_distribution == 'MacOSX' else 'yes' }}"
+    package:
+      name: stow
+      state: latest
