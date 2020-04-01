@@ -65,7 +65,7 @@
     become: "{{ 'no' if ansible_distribution == 'MacOSX' else 'yes' }}"
     package:
       name: vim
-      state: latest
+      state: present
 
 - name: Setup Vundle
   hosts: localhost
@@ -141,7 +141,7 @@
     become: "{{ 'no' if ansible_distribution == 'MacOSX' else 'yes' }}"
     package:
       name: tmux
-      state: latest
+      state: present
   - name: Install tpm
     git:
       repo: https://github.com/tmux-plugins/tpm
@@ -154,4 +154,13 @@
     become: "{{ 'no' if ansible_distribution == 'MacOSX' else 'yes' }}"
     package:
       name: stow
+      state: present
+
+- name: Setup Go
+  hosts: localhost
+  tasks:
+  - name: Install go
+    become: "{{ 'no' if ansible_distribution == 'MacOSX' else 'yes' }}"
+    package:
+      name: go
       state: latest
