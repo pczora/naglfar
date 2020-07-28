@@ -164,3 +164,12 @@
     package:
       name: go
       state: latest
+
+- name: Setup thefuck
+  hosts: localhost
+  tasks:
+  - name: Install thefuck
+    become: "{{ 'no' if ansible_distribution == 'MacOSX' else 'yes' }}"
+    package:
+      name: thefuck
+      state: present
