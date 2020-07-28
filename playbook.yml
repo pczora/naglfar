@@ -34,7 +34,7 @@
       path: ~/.nvm
     register: nvmdir
 
-  - name: Download oh-my-zsh-installer
+  - name: Download nvm installer
     get_url: 
       url: https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh
       dest: /tmp/nvm.sh
