@@ -1,31 +1,8 @@
 ---
-- name: Setup SDKMan
+- name: Install SDKMan
   hosts: localhost
   tasks:
-  - name: Check if SDKMan is already installed
-    stat:
-      path: ~/.sdkman
-    register: sdkmandir
-
-  - name: Download SDKMan installer
-    get_url:
-      url: https://get.sdkman.io
-      dest: /tmp/sdkman.sh
-    when: sdkmandir.stat.exists == False
-  - name: Set installer file modes
-    file:
-      path: /tmp/sdkman.sh
-      mode: a+x
-    when: sdkmandir.stat.exists == False
-  - name: Install SDKMan
-    shell: /tmp/sdkman.sh
-    when: sdkmandir.stat.exists == False
-  - name: Remove installer
-    file:
-      path: /tmp/sdkman.sh
-      state: absent
-    when: sdkmandir.stat.exists == False
-
+  - import_tasks: tasks/sdkman/sdkman.yaml
 - name: Setup nvm
   hosts: localhost
   tasks:
@@ -75,9 +52,14 @@
       repo: https://github.com/VundleVim/Vundle.vim.git
       dest: ~/.vim/bundle/Vundle.vim
 
-- name: Setup oh-my-zsh
+- name: Setup zsh & oh-my-zsh
   hosts: localhost
   tasks:
+  - name: Install zsh
+    become: 'yes'
+    package:
+      name: zsh
+      state: present
   - name: Check if oh-my-zsh is already installed
     stat:
       path: ~/.oh-my-zsh
@@ -102,6 +84,14 @@
       state: absent
     when: ohmyzshdir.stat.exists == False
 
+- name: Setup fish
+  hosts: localhost
+  tasks:
+    - name: Install fish
+      become: 'yes'
+      package:
+        name: fish
+        state: present
 - name: Setup spaceship-prompt
   hosts: localhost
   tasks:
@@ -156,15 +146,27 @@
       name: stow
       state: present
 
-- name: Setup Go
+- name: Setup Go environment
   hosts: localhost
   tasks:
-  - name: Install go
+  - name: install go
+    become: "{{ 'no' if ansible_distribution == 'macosx' else 'yes' }}"
+    package:
+      name: golang
+      state: latest
+  - name: install gopls
+    become: "{{ 'no' if ansible_distribution == 'macosx' else 'yes' }}"
+    package:
+      name: gopls
+      state: latest
+- name: Setup fzf
+  hosts: localhost
+  tasks:
+  - name: Install fzf
     become: "{{ 'no' if ansible_distribution == 'MacOSX' else 'yes' }}"
     package:
-      name: go
-      state: latest
-
+      name: fzf
+      state: present
 - name: Setup thefuck
   hosts: localhost
   tasks:
@@ -173,3 +175,19 @@
     package:
       name: thefuck
       state: present
+- name: Setup exa
+  hosts: localhost
+  tasks:
+    - name: Install exa
+      become: yes
+      package:
+        name: exa
+        state: present
+- name: Setup bat
+  hosts: localhost
+  tasks:
+    - name: Install bat
+      become: yes
+      package:
+        name: bat
+        state: present

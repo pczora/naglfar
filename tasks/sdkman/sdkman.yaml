@@ -1,0 +1,28 @@
+- name: Check if SDKMan is already installed
+  stat:
+    path: ~/.sdkman
+  register: sdkmandir
+- name: Install zip and unzip
+  become: yes
+  package:
+    name: 
+    - unzip
+    - zip
+- name: Download SDKMan installer
+  get_url:
+    url: https://get.sdkman.io
+    dest: /tmp/sdkman.sh
+  when: sdkmandir.stat.exists == False
+- name: Set installer file modes
+  file:
+    path: /tmp/sdkman.sh
+    mode: a+x
+  when: sdkmandir.stat.exists == False
+- name: Install SDKMan
+  shell: /tmp/sdkman.sh
+  when: sdkmandir.stat.exists == False
+- name: Remove installer
+  file:
+    path: /tmp/sdkman.sh
+    state: absent
+  when: sdkmandir.stat.exists == False
